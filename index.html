@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project 1: The Automated Backup Script | Linux for Cloud Engineers</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --code-bg: #1e293b;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        code, pre, .code-block, kbd {
+            font-family: 'Courier New', Monaco, Consolas, monospace;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            z-index: 1000;
+            padding: 2rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 1rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.15rem;
+            color: var(--primary-color);
+            margin-bottom: 0.35rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 0 1rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .nav-links li {
+            margin-bottom: 0.2rem;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 0.6rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .nav-links a:hover {
+            background: var(--bg-color);
+            color: var(--primary-color);
+        }
+
+        .nav-links a.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+        }
+
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 3.5rem 3rem;
+            margin-bottom: 2rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .hero .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 0.8rem;
+            opacity: 0.85;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero h1 {
+            font-size: 2.25rem;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+            font-family: Georgia, serif;
+        }
+
+        .hero p {
+            font-size: 1.05rem;
+            opacity: 0.92;
+            max-width: 760px;
+        }
+
+        .hero p.subtitle {
+            color: #4ade80;
+            opacity: 1;
+            font-weight: 500;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            margin-top: 1rem;
+            margin-right: 0.5rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 3rem 3rem;
+        }
+
+        section {
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 3px solid var(--primary-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            margin: 1.75rem 0 0.85rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        h4 {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            margin: 1.25rem 0 0.6rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            max-width: 74ch;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 0.6rem;
+            padding: 1.75rem 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            color: #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1.4rem 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: 'SHELL';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(255,255,255,0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.7rem;
+            font-family: -apple-system, sans-serif;
+        }
+
+        .code-block code {
+            white-space: pre;
+        }
+
+        .keyword { color: #c678dd; }
+        .string { color: #98c379; }
+        .comment { color: #5c6370; font-style: italic; }
+        .function { color: #61afef; }
+        .variable { color: #e06c75; }
+        .number { color: #d19a66; }
+        .sudo { color: #f59e0b; font-weight: bold; }
+
+        .diagram-container {
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+            border: 2px solid var(--border-color);
+        }
+
+        .diagram-container svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .figure-caption {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-top: 0.75rem;
+            font-family: -apple-system, sans-serif;
+        }
+
+        .step {
+            margin-bottom: 2rem;
+            padding: 1.5rem 1.75rem;
+            background: var(--card-bg);
+            border-radius: 0.6rem;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .step-label {
+            font-family: -apple-system, sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-size: 0.75rem;
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: var(--card-bg);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            font-family: -apple-system, sans-serif;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.85rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid;
+            font-family: -apple-system, sans-serif;
+            font-size: 0.92rem;
+        }
+
+        .alert p, .alert strong { color: inherit; max-width: none; }
+
+        .alert-success { background: #d1fae5; border-color: var(--success-color); color: #065f46; }
+        .alert-error { background: #fee2e2; border-color: var(--error-color); color: #991b1b; }
+        .alert-warning { background: #fef3c7; border-color: var(--warning-color); color: #92400e; }
+        .alert-info { background: #dbeafe; border-color: var(--primary-color); color: #1e40af; }
+        .alert-security { background: #ede9fe; border-color: #7c3aed; color: #4c1d95; }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 1.75rem;
+            color: var(--text-primary);
+            max-width: 74ch;
+        }
+
+        li { margin-bottom: 0.5rem; }
+
+        .skill-item {
+            background: var(--card-bg);
+            padding: 1.25rem 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            font-family: -apple-system, sans-serif;
+        }
+
+        .skill-item h4 { margin-top: 0; }
+        .skill-item p { font-size: 0.88rem; color: var(--text-secondary); }
+
+        .exercise {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.4rem 1.6rem;
+            border-radius: 0.6rem;
+            margin-bottom: 1rem;
+            font-family: -apple-system, sans-serif;
+        }
+
+        .exercise h4 { color: white; margin-bottom: 0.5rem; }
+        .exercise p { color: rgba(255,255,255,0.9); max-width: none; }
+
+        .callout {
+            background: var(--primary-color);
+            color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            margin: 2rem 0;
+            font-family: -apple-system, sans-serif;
+        }
+
+        .callout h3 { color: white; margin-top: 0; }
+        .callout p { color: rgba(255,255,255,0.9); max-width: none; }
+
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1100;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: -apple-system, sans-serif;
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-menu-btn { display: block; }
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .hero { padding: 2rem 1.5rem; }
+            .hero h1 { font-size: 1.6rem; }
+            .container { padding: 0 1.5rem 1.5rem; }
+            h2 { font-size: 1.4rem; }
+        }
+
+        html { scroll-behavior: smooth; }
+
+        footer {
+            background: var(--text-primary);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-family: -apple-system, sans-serif;
+        }
+
+        footer a { color: var(--accent-color); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h2>Linux Projects</h2>
+            <p>Cloud Engineering Track</p>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#overview" class="active">1. Overview</a></li>
+            <li><a href="#model">2. The Production Model</a></li>
+            <li><a href="#provisioning">3. Provisioning the Source</a></li>
+            <li><a href="#destination">4. The Backup Destination</a></li>
+            <li><a href="#script">5. The Script</a></li>
+            <li><a href="#execution">6. Execution and Verification</a></li>
+            <li><a href="#analysis">7. Analysis of the Script</a></li>
+            <li><a href="#architecture">8. Architecture</a></li>
+            <li><a href="#security">9. Security Considerations</a></li>
+            <li><a href="#skills">10. Skills Matrix</a></li>
+            <li><a href="#failures">11. Failure Modes</a></li>
+            <li><a href="#exercises">12. Extension Exercises</a></li>
+            <li><a href="#next">13. Continuity to Project 2</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">Menu</button>
+
+        <section class="hero">
+            <div class="eyebrow">Simple Linux Projects for Cloud Engineers — Project 1</div>
+            <h1>The Automated Backup Script</h1>
+            <p class="subtitle">An examination of directory compression, timestamping, and failure-aware scripting, built around the permission model that governs real production systems.</p>
+            <div>
+                <span class="badge">Bash Scripting</span>
+                <span class="badge">File Permissions</span>
+                <span class="badge">Error Handling</span>
+                <span class="badge">Automation</span>
+            </div>
+        </section>
+
+        <div class="container">
+
+            <section id="overview">
+                <h2>1. Overview</h2>
+                <div class="card">
+                    <p>Cloud infrastructure accumulates data that cannot be easily reconstructed: application code, configuration files, database dumps, SSL certificates. The loss of any of these, without a copy stored elsewhere, constitutes an operational failure. The discipline that prevents this failure is backup automation — a script, run on a schedule, that performs the same protective action reliably and without a human deciding, each night, whether to remember to do it.</p>
+                    <p>This project constructs that script. The exercise is not primarily about the <code>tar</code> command; <code>tar</code> is learned in an afternoon. The exercise is about a habit of mind common to cloud engineers: a repeatable manual task is encoded into a script, the script is made to fail loudly rather than silently, and its output is made predictable enough that another system — cron, a monitor, an on-call engineer — can trust it without reading the source.</p>
+                </div>
+
+                <h3>What the finished script does</h3>
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>Core behavior</h4>
+                        <ul>
+                            <li>Accepts a source directory, such as <code>/var/www/html</code></li>
+                            <li>Produces a compressed <code>.tar.gz</code> archive</li>
+                            <li>Names the archive with a timestamp</li>
+                            <li>Writes the archive to a backup directory</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Production requirements</h4>
+                        <ul>
+                            <li>Reports success or failure in plain language</li>
+                            <li>Exits with a meaningful exit code</li>
+                            <li>Validates that source and destination exist before acting</li>
+                            <li>Operates correctly under a non-root user with read-only access to the source</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="model">
+                <h2>2. The Production Model</h2>
+                <div class="card">
+                    <p>Tutorials that back up a user's own home directory teach the mechanics of <code>tar</code> but skip the constraint that actually defines production work: <strong>the process performing the backup rarely owns the files it is backing up.</strong> A web application's files are typically owned by <code>root</code> or by a dedicated service account, while the engineer's own account — the one that will eventually run this script from cron — holds only enough privilege to read them.</p>
+                    <p>This project is built under that constraint from the outset. A dedicated Linux user, referred to here as <code>linux-guy</code>, performs all of the work in this chapter. Directory creation and file ownership under <code>/var/www/html</code> require elevated privilege and are performed with <code>sudo</code>; everything downstream — reading the files, compressing them, writing the archive — is performed as an ordinary, unprivileged user. This separation is not an incidental detail. It is the reason the script must validate its inputs rather than assume they exist, and it is the reason file permissions, not merely file paths, become part of the design.</p>
+                </div>
+            </section>
+
+            <section id="provisioning">
+                <h2>3. Provisioning the Production Source Directory</h2>
+                <div class="step">
+                    <div class="step-label">Requires sudo</div>
+                    <p>The standard location for web content on a Linux server is <code>/var/www/html</code>. Because this path sits outside the home directory, its creation requires elevated privilege. The commands below create the directory, populate it with two representative files, and then adjust permissions so that an unprivileged user can read — but not modify — the contents.</p>
+                    <div class="code-block">
+<code><span class="comment"># 1. Create the standard web directory</span>
+<span class="sudo">sudo</span> <span class="function">mkdir</span> -p /var/www/html
+
+<span class="comment"># 2. Create a dummy production file</span>
+<span class="sudo">sudo</span> sh -c <span class="string">'echo "&lt;h1&gt;Production Website&lt;/h1&gt;" &gt; /var/www/html/index.html'</span>
+<span class="sudo">sudo</span> sh -c <span class="string">'echo "db_password=supersecret" &gt; /var/www/html/config.txt'</span>
+
+<span class="comment"># 3. Ensure your user can READ the files (but not modify them)</span>
+<span class="sudo">sudo</span> <span class="function">chmod</span> -R <span class="number">755</span> /var/www/html</code>
+                    </div>
+                    <p>Two details are worth pausing on. First, <code>sudo sh -c '...'</code> is required rather than <code>sudo echo "..." &gt; /var/www/html/index.html</code>, because shell redirection (<code>&gt;</code>) is interpreted by the <em>current</em> shell, which is not running as root — only the <code>echo</code> would run with elevated privilege, and the redirection itself would still fail with "Permission denied." Wrapping the entire command in <code>sh -c</code> and elevating that gives root the redirection as well.</p>
+                    <p>Second, <code>config.txt</code> contains a plaintext credential. This is intentional: a realistic source directory sometimes contains files that should not exist in this form, and the security discussion in Section 9 returns to exactly this file.</p>
+                    <p>After these commands, the directory is owned by <code>root</code>, and <code>chmod -R 755</code> grants read and execute permission to <em>all</em> users — owner, group, and others — while restricting write access to the owner. This is the permission model a backup script will actually encounter: it can read everything under <code>/var/www/html</code>, but it did not create any of it and cannot change it.</p>
+                </div>
+            </section>
+
+            <section id="destination">
+                <h2>4. The Backup Destination</h2>
+                <div class="step">
+                    <div class="step-label">Runs as linux-guy, no sudo required</div>
+                    <p>Unlike the source directory, the backup destination is owned by the account that will run the script, since that account must be able to write new archives into it on every run.</p>
+                    <div class="code-block">
+<code><span class="function">mkdir</span> -p ~/backups</code>
+                    </div>
+                    <p>No elevation is required here, and none should be. A script that needs <code>sudo</code> to write its own backups is a script whose blast radius, in the event of a bug, is far larger than it needs to be.</p>
+                </div>
+            </section>
+
+            <section id="script">
+                <h2>5. The Script</h2>
+                <div class="step">
+                    <p>The script below is written for the production directory established in Section 3. It is created with <code>nano</code>, though any editor produces the same file:</p>
+                    <div class="code-block">
+<code>nano ~/backup.sh</code>
+                    </div>
+                    <div class="code-block">
+<code><span class="comment">#!/bin/bash</span>
+
+<span class="comment"># ============================================</span>
+<span class="comment"># Automated Backup Script</span>
+<span class="comment"># Compresses a target directory with a timestamp</span>
+<span class="comment"># ============================================</span>
+
+<span class="comment"># --- Configuration (Variables) ---</span>
+<span class="variable">SOURCE_DIR</span>=<span class="string">"/var/www/html"</span>
+<span class="variable">BACKUP_DIR</span>=<span class="string">"$HOME/backups"</span>
+<span class="variable">TIMESTAMP</span>=$(<span class="function">date</span> +<span class="string">"%Y-%m-%d_%H-%M-%S"</span>)
+<span class="variable">BACKUP_FILE</span>=<span class="string">"${BACKUP_DIR}/backup_${TIMESTAMP}.tar.gz"</span>
+
+<span class="comment"># --- Error Handling: Does the source exist? ---</span>
+<span class="keyword">if</span> [ ! -d <span class="string">"$SOURCE_DIR"</span> ]; <span class="keyword">then</span>
+    <span class="function">echo</span> <span class="string">"ERROR: Source directory '$SOURCE_DIR' does not exist."</span>
+    <span class="function">exit</span> <span class="number">1</span>
+<span class="keyword">fi</span>
+
+<span class="comment"># --- Error Handling: Does the destination exist? ---</span>
+<span class="keyword">if</span> [ ! -d <span class="string">"$BACKUP_DIR"</span> ]; <span class="keyword">then</span>
+    <span class="function">echo</span> <span class="string">"Backup directory not found. Creating '$BACKUP_DIR'..."</span>
+    <span class="function">mkdir</span> -p <span class="string">"$BACKUP_DIR"</span>
+    <span class="keyword">if</span> [ $? -ne <span class="number">0</span> ]; <span class="keyword">then</span>
+        <span class="function">echo</span> <span class="string">"ERROR: Failed to create backup directory."</span>
+        <span class="function">exit</span> <span class="number">1</span>
+    <span class="keyword">fi</span>
+<span class="keyword">fi</span>
+
+<span class="comment"># --- Perform the Backup ---</span>
+<span class="function">echo</span> <span class="string">"Starting backup of '$SOURCE_DIR'..."</span>
+<span class="function">tar</span> -czf <span class="string">"$BACKUP_FILE"</span> -C <span class="string">"$(dirname "$SOURCE_DIR")"</span> <span class="string">"$(basename "$SOURCE_DIR")"</span>
+
+<span class="comment"># --- Check if tar succeeded ---</span>
+<span class="keyword">if</span> [ $? -eq <span class="number">0</span> ]; <span class="keyword">then</span>
+    <span class="function">echo</span> <span class="string">"SUCCESS: Backup created at '$BACKUP_FILE'"</span>
+    <span class="function">ls</span> -lh <span class="string">"$BACKUP_FILE"</span>
+    <span class="function">exit</span> <span class="number">0</span>
+<span class="keyword">else</span>
+    <span class="function">echo</span> <span class="string">"ERROR: Backup failed."</span>
+    <span class="function">exit</span> <span class="number">1</span>
+<span class="keyword">fi</span></code>
+                    </div>
+                    <p>The file is saved (<kbd>Ctrl+O</kbd>, <kbd>Enter</kbd>, <kbd>Ctrl+X</kbd> in <code>nano</code>) and marked executable:</p>
+                    <div class="code-block">
+<code><span class="function">chmod</span> +x ~/backup.sh</code>
+                    </div>
+                    <p>Note what did <em>not</em> change from a naive version of this script: no <code>sudo</code> appears anywhere in it. The 755 permissions set in Section 3 are sufficient for an unprivileged process to read and archive every file under <code>/var/www/html</code>. A backup script that requires root to run is a design flaw, not a convenience.</p>
+                </div>
+            </section>
+
+            <section id="execution">
+                <h2>6. Execution and Verification</h2>
+                <div class="card">
+                    <p>The script is run directly, as <code>linux-guy</code>, with no elevated privilege:</p>
+                    <div class="code-block">
+<code>~/backup.sh</code>
+                    </div>
+                    <p>Its expected output:</p>
+                    <div class="code-block">
+<code>Starting backup of <span class="string">'/var/www/html'</span>...
+SUCCESS: Backup created at <span class="string">'/home/linux-guy/backups/backup_2026-09-14_20-35-12.tar.gz'</span>
+-rw-r--r-- 1 linux-guy linux-guy 245 Sep 14 20:35 /home/linux-guy/backups/backup_2026-09-14_20-35-12.tar.gz</code>
+                    </div>
+                    <p>The archive's ownership is worth noting: even though the source files under <code>/var/www/html</code> are owned by <code>root</code>, the resulting <code>.tar.gz</code> is owned by the account that ran <code>tar</code> — <code>linux-guy</code>. Compression does not preserve the privilege boundary of the source; it produces a new, independent artifact owned by whoever created it.</p>
+                    <p>The archive's integrity is confirmed by listing its contents without extracting them:</p>
+                    <div class="code-block">
+<code><span class="function">tar</span> -tzf ~/backups/backup_*.tar.gz</code>
+                    </div>
+                    <p>A correct run lists <code>html/index.html</code> and <code>html/config.txt</code>, confirming that both files were captured.</p>
+                </div>
+            </section>
+
+            <section id="analysis">
+                <h2>7. Analysis of the Script</h2>
+
+                <div class="card">
+                    <h4>The interpreter directive</h4>
+                    <p>The first line, <code>#!/bin/bash</code>, is not a comment despite its appearance; it is a directive to the kernel specifying which interpreter should execute the file. In its absence, the system may fall back to <code>sh</code>, a more limited shell under which some Bash-specific syntax fails. Its inclusion is not optional in any script intended for reuse.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Variables and configurability</h4>
+                    <div class="code-block">
+<code><span class="variable">SOURCE_DIR</span>=<span class="string">"/var/www/html"</span>
+<span class="variable">BACKUP_DIR</span>=<span class="string">"$HOME/backups"</span></code>
+                    </div>
+                    <p>Paths are declared once, at the top of the file, rather than repeated inline throughout the script. This is not stylistic preference. When a backup destination changes — as it eventually will, often to an S3 bucket — a single line is edited instead of every occurrence of a hardcoded path. Configurability at the top of a script is one of the load-bearing habits of automation work.</p>
+                    <div class="alert alert-warning">
+                        <strong>On quoting:</strong> every variable expansion in this script is wrapped in double quotes. If a path ever contained a space — <code>/home/john doe/backups</code>, for instance — an unquoted expansion would split into two separate arguments and the command would fail in a way that is difficult to diagnose. Quoting is defensive, not decorative.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>The timestamp</h4>
+                    <div class="code-block">
+<code><span class="variable">TIMESTAMP</span>=$(<span class="function">date</span> +<span class="string">"%Y-%m-%d_%H-%M-%S"</span>)</code>
+                    </div>
+                    <p>The <code>$()</code> construct is command substitution: the output of <code>date</code>, formatted according to the given string, is captured into a variable. Its purpose is uniqueness — without a timestamp, each run of the script would silently overwrite the previous backup, and the ability to restore to a specific point in time would be lost entirely. In a production incident, the question is rarely "do we have a backup?" but "do we have <em>Tuesday's</em> backup?" A timestamp is what makes that question answerable.</p>
+                    <div class="alert alert-info">
+                        Hyphens and underscores are used deliberately in place of colons or slashes. Colons cause problems on some filesystems and in some tools; slashes would be parsed as directory separators. A naming convention is part of a script's interface, not an afterthought.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>Constructing the output path</h4>
+                    <div class="code-block">
+<code><span class="variable">BACKUP_FILE</span>=<span class="string">"${BACKUP_DIR}/backup_${TIMESTAMP}.tar.gz"</span></code>
+                    </div>
+                    <p>The braces around each variable name disambiguate where the name ends and literal text begins. Without them, <code>$BACKUP_DIR_file</code> would be parsed as a reference to a variable literally named <code>BACKUP_DIR_file</code>, which does not exist. <code>${BACKUP_DIR}</code> removes the ambiguity and is the convention used throughout production scripts.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Validating the source</h4>
+                    <div class="code-block">
+<code><span class="keyword">if</span> [ ! -d <span class="string">"$SOURCE_DIR"</span> ]; <span class="keyword">then</span>
+    <span class="function">echo</span> <span class="string">"ERROR: Source directory '$SOURCE_DIR' does not exist."</span>
+    <span class="function">exit</span> <span class="number">1</span>
+<span class="keyword">fi</span></code>
+                    </div>
+                    <p>The <code>-d</code> test evaluates whether the given path is a directory; the leading <code>!</code> negates it. The condition reads, in full: if this path is not a directory, report the failure and stop. The <code>exit 1</code> is the operative part. Every process on Linux returns a numeric exit status on completion — <code>0</code> for success, any nonzero value for failure. Once this script is invoked by cron (Project 2) or a monitoring system, that exit status is the only signal those systems have. A script that always exits <code>0</code>, even after failing internally, converts every future failure into a silent one.</p>
+                </div>
+
+                <div class="card">
+                    <h4>The compression command</h4>
+                    <div class="code-block">
+<code><span class="function">tar</span> -czf <span class="string">"$BACKUP_FILE"</span> -C <span class="string">"$(dirname "$SOURCE_DIR")"</span> <span class="string">"$(basename "$SOURCE_DIR")"</span></code>
+                    </div>
+                    <table>
+                        <thead><tr><th>Element</th><th>Function</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>tar</code></td><td>Tape archive — bundles multiple files into one</td></tr>
+                            <tr><td><code>-c</code></td><td>Create a new archive</td></tr>
+                            <tr><td><code>-z</code></td><td>Compress the archive with gzip</td></tr>
+                            <tr><td><code>-f</code></td><td>Specify the archive's filename (must be the final flag)</td></tr>
+                            <tr><td><code>"$BACKUP_FILE"</code></td><td>The output path</td></tr>
+                            <tr><td><code>-C "$(dirname "$SOURCE_DIR")"</code></td><td>Change into the parent directory before archiving</td></tr>
+                            <tr><td><code>"$(basename "$SOURCE_DIR")"</code></td><td>Archive only this folder, relative to that parent</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="alert alert-success">
+                        Without the <code>-C</code>/<code>dirname</code>/<code>basename</code> combination, <code>tar</code> would store each file's full absolute path inside the archive — <code>var/www/html/index.html</code> rather than <code>html/index.html</code>. Extracting such an archive attempts to recreate that entire path structure from the filesystem root, which is rarely what is wanted and occasionally dangerous. Archiving relative to the parent directory produces a portable artifact that can be extracted anywhere.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>Reporting the result</h4>
+                    <div class="code-block">
+<code><span class="keyword">if</span> [ $? -eq <span class="number">0</span> ]; <span class="keyword">then</span>
+    <span class="function">echo</span> <span class="string">"SUCCESS: ..."</span>
+    <span class="function">exit</span> <span class="number">0</span>
+<span class="keyword">else</span>
+    <span class="function">echo</span> <span class="string">"ERROR: ..."</span>
+    <span class="function">exit</span> <span class="number">1</span>
+<span class="keyword">fi</span></code>
+                    </div>
+                    <p>The special variable <code>$?</code> holds the exit status of the immediately preceding command — here, <code>tar</code>. On success, the file size is printed via <code>ls -lh</code> as immediate visual confirmation; on failure, the script exits nonzero, and the calling context — a terminal, a cron job, a monitoring agent — is responsible for acting on that.</p>
+                </div>
+            </section>
+
+            <section id="architecture">
+                <h2>8. Architecture</h2>
+                <div class="diagram-container">
+                    <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#64748b" />
+                            </marker>
+                        </defs>
+                        <rect x="20" y="90" width="150" height="90" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+                        <text x="95" y="125" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="600" fill="#1e293b">/var/www/html</text>
+                        <text x="95" y="145" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#64748b">owned by root</text>
+                        <text x="95" y="160" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#64748b">mode 755</text>
+
+                        <line x1="170" y1="135" x2="230" y2="135" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+                        <rect x="230" y="70" width="180" height="130" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+                        <text x="320" y="95" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="600" fill="#1e293b">backup.sh</text>
+                        <text x="320" y="118" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748b">validate source</text>
+                        <text x="320" y="136" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748b">validate destination</text>
+                        <text x="320" y="154" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748b">generate timestamp</text>
+                        <text x="320" y="172" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748b">runs as linux-guy</text>
+
+                        <line x1="410" y1="135" x2="470" y2="135" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+                        <rect x="470" y="90" width="150" height="90" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+                        <text x="545" y="125" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="600" fill="#1e293b">tar -czf</text>
+                        <text x="545" y="145" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#64748b">compression</text>
+                        <text x="545" y="160" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#64748b">engine</text>
+
+                        <line x1="620" y1="135" x2="680" y2="135" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+                        <rect x="680" y="90" width="200" height="90" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="2"/>
+                        <text x="780" y="120" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="600" fill="#1e293b">~/backups/</text>
+                        <text x="780" y="140" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">backup_2026-09-14_</text>
+                        <text x="780" y="153" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b">20-35-12.tar.gz</text>
+                        <text x="780" y="170" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748b">owned by linux-guy</text>
+
+                        <line x1="320" y1="200" x2="320" y2="240" stroke="#ef4444" stroke-width="2" marker-end="url(#arrow)"/>
+                        <rect x="220" y="240" width="200" height="45" rx="8" fill="#fee2e2" stroke="#ef4444" stroke-width="1.5"/>
+                        <text x="320" y="260" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#991b1b" font-weight="600">validation or tar failure</text>
+                        <text x="320" y="276" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#991b1b">exit 1</text>
+
+                        <line x1="780" y1="180" x2="780" y2="240" stroke="#10b981" stroke-width="2" marker-end="url(#arrow)"/>
+                        <rect x="680" y="240" width="200" height="45" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="1.5"/>
+                        <text x="780" y="260" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#065f46" font-weight="600">archive verified</text>
+                        <text x="780" y="276" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#065f46">exit 0</text>
+                    </svg>
+                    <p class="figure-caption">Figure 1. Data flow from the privileged source directory through the unprivileged backup process to the resulting archive, with the two terminal exit states shown below.</p>
+                </div>
+                <div class="card">
+                    <h4>Reading the diagram</h4>
+                    <p>The diagram traces two properties simultaneously: the flow of data, left to right, and the change of ownership at each stage. <code>/var/www/html</code> is owned by <code>root</code>; the script that reads it runs as an unprivileged user; the archive it produces is owned by that same unprivileged user. No stage in this flow requires the backup process to hold more privilege than it needs — the definition of least-privilege design.</p>
+                    <p>The two branches at the bottom are not decorative. The red path — a failed validation or a failed <code>tar</code> invocation — terminates in <code>exit 1</code>. The green path terminates in <code>exit 0</code>. This is the entire interface a monitoring system needs: it does not read the script's logic, only its exit code.</p>
+                </div>
+                <div class="callout">
+                    <h3>Why this generalizes</h3>
+                    <p>At scale, this exact shape reappears with different names. The source directory becomes an EBS volume or an RDS snapshot. The script becomes a Lambda function or an SSM Run Command document. The backup destination becomes an S3 bucket governed by a lifecycle policy. The printed output becomes a CloudWatch log stream, and the exit code becomes the trigger for an SNS notification or a PagerDuty alert. The mechanics change; the shape — validate, act, report a status a machine can act on — does not.</p>
+                </div>
+            </section>
+
+            <section id="security">
+                <h2>9. Security Considerations</h2>
+                <div class="card">
+                    <p>The provisioning step in Section 3 created <code>config.txt</code> containing <code>db_password=supersecret</code> in plaintext, then made it world-readable with <code>chmod -R 755</code>. This was done deliberately, to surface a problem that recurs constantly in real backup systems: <strong>a backup script that faithfully archives everything in its source directory will faithfully archive secrets that should never have been stored there in the first place.</strong></p>
+                    <div class="alert alert-security">
+                        <strong>The lesson, not just the fix:</strong> <code>755</code> permissions on a directory containing credentials mean that <em>any local user on the system</em> can read that password — not only the account performing backups. A production system would instead restrict such a file with something like <code>chmod 640</code> and group ownership limited to the application's service account, or — preferably — remove the credential from the filesystem entirely in favor of a secrets manager (AWS Secrets Manager, SSM Parameter Store, Vault). The backup script did nothing wrong here; the exposure was already present in the source directory. A backup script is not a security boundary, and it should never be trusted to become one.
+                    </div>
+                    <p>This distinction — between what the script is responsible for (reliable, verifiable archiving) and what it is not responsible for (deciding what belongs in the source directory) — is itself a production habit worth internalizing early.</p>
+                </div>
+            </section>
+
+            <section id="skills">
+                <h2>10. Skills Matrix</h2>
+                <div class="grid-3">
+                    <div class="skill-item">
+                        <h4>File management</h4>
+                        <p><code>tar</code>, <code>gzip</code>, and the construction of portable archives</p>
+                    </div>
+                    <div class="skill-item">
+                        <h4>Privilege separation</h4>
+                        <p><code>sudo</code> for provisioning, unprivileged execution for the script itself</p>
+                    </div>
+                    <div class="skill-item">
+                        <h4>Permissions</h4>
+                        <p><code>chmod</code>, ownership, and the difference between read and write access</p>
+                    </div>
+                    <div class="skill-item">
+                        <h4>Error handling</h4>
+                        <p>Directory validation and <code>$?</code> to prevent cascading failure</p>
+                    </div>
+                    <div class="skill-item">
+                        <h4>Exit codes</h4>
+                        <p>The interface between a script and the systems that call it</p>
+                    </div>
+                    <div class="skill-item">
+                        <h4>Command substitution</h4>
+                        <p><code>$(date ...)</code>, <code>$(dirname ...)</code>, <code>$(basename ...)</code></p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="failures">
+                <h2>11. Failure Modes</h2>
+                <div class="grid-2">
+                    <div class="alert alert-error">
+                        <h4>Missing execute permission</h4>
+                        <p>Running <code>~/backup.sh</code> without a preceding <code>chmod +x</code> produces "Permission denied."</p>
+                    </div>
+                    <div class="alert alert-error">
+                        <h4>Unquoted paths containing spaces</h4>
+                        <p><code>tar -czf $BACKUP_FILE</code>, without quotes, splits on any embedded space and fails unpredictably.</p>
+                    </div>
+                    <div class="alert alert-error">
+                        <h4>Whitespace around assignment</h4>
+                        <p><code>SOURCE_DIR = "/path"</code> is invalid Bash; assignment permits no space on either side of <code>=</code>.</p>
+                    </div>
+                    <div class="alert alert-error">
+                        <h4>Checking <code>$?</code> after the wrong command</h4>
+                        <p><code>$?</code> always reflects the immediately preceding command. An <code>echo</code> inserted between <code>tar</code> and the subsequent <code>if [ $? ... ]</code> check causes the script to evaluate <code>echo</code>'s exit status — always <code>0</code> — rather than <code>tar</code>'s.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="exercises">
+                <h2>12. Extension Exercises</h2>
+                <p>Each exercise below is intended to be attempted individually, after the base script is verified to work.</p>
+
+                <div class="exercise">
+                    <h4>1. Accept a command-line argument</h4>
+                    <p>Replace the hardcoded <code>SOURCE_DIR</code> with <code>$1</code>, allowing <code>./backup.sh /var/www/html</code> to target any directory the invoking user can read.</p>
+                </div>
+
+                <div class="exercise">
+                    <h4>2. Prune backups older than seven days</h4>
+                    <p>Append <code>find "$BACKUP_DIR" -name "backup_*.tar.gz" -mtime +7 -delete</code>. Unbounded retention is a real and common cause of disks filling silently in production.</p>
+                </div>
+
+                <div class="exercise">
+                    <h4>3. Persist a log file</h4>
+                    <p>Redirect the script's output with <code>&gt;&gt; /var/log/backup.log</code> so that a history of runs survives beyond the terminal session that produced them.</p>
+                </div>
+
+                <div class="exercise">
+                    <h4>4. Verify archive integrity</h4>
+                    <p>Run <code>tar -tzf "$BACKUP_FILE" &gt; /dev/null</code> immediately after creation and check its exit status, confirming the archive is not corrupted before reporting success.</p>
+                </div>
+
+                <div class="exercise">
+                    <h4>5. Address the credential in config.txt</h4>
+                    <p>Before adding cloud storage, resolve the issue raised in Section 9: either restrict <code>config.txt</code> to <code>640</code> with appropriate group ownership, or remove the secret from the filesystem in favor of a secrets manager.</p>
+                </div>
+
+                <div class="exercise">
+                    <h4>6. Transmit to cloud storage</h4>
+                    <p>Copy the completed archive off-host with <code>aws s3 cp "$BACKUP_FILE" s3://my-backup-bucket/</code>, the point at which this exercise becomes indistinguishable from a real production backup pipeline.</p>
+                </div>
+            </section>
+
+            <section id="next">
+                <h2>13. Continuity to Project 2</h2>
+                <div class="callout">
+                    <h3>Cron Job Automation</h3>
+                    <p>Once the script runs correctly by hand, Project 2 removes the human from the loop entirely: the script is scheduled to run every night at a fixed hour, unattended. Everything constructed here — the validated inputs, the meaningful exit codes, the timestamped and permission-aware output — is what makes an unattended nightly run trustworthy rather than a liability.</p>
+                </div>
+            </section>
+
+        </div>
+
+        <footer>
+            <p>Simple Linux Projects for Cloud Engineers — Project 1</p>
+        </footer>
+    </main>
+
+    <script>
+        const sections = document.querySelectorAll('[id]');
+        const navLinks = document.querySelectorAll('.nav-links a');
+
+        function highlightNavigation() {
+            let scrollY = window.pageYOffset;
+            sections.forEach(current => {
+                const sectionHeight = current.offsetHeight;
+                const sectionTop = current.offsetTop - 100;
+                const sectionId = current.getAttribute('id');
+                if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === '#' + sectionId) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }
+        window.addEventListener('scroll', highlightNavigation);
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+    </script>
+</body>
+</html>
