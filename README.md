@@ -6,8 +6,8 @@ A hands-on project series for building the Linux fundamentals that underpin real
 
 | # | Project | Status | Live Page | Skills |
 |---|---------|--------|-----------|--------|
-| 1 | [Automated Backup Script](projects/01-automated-backup-script/index.html) | ✅ Complete | [View](https://Elixirman.github.io/linux-cloud-project1-Automated-backup-
-/projects/01-automated-backup-script/) | `tar`, `gzip`, variables, exit codes, permissions |
+| 1 | [Automated Backup Script](index.html) | ✅ Complete | 🔗 **[View Live Demo](https://elixirman.github.io/linux-cloud-project1-Automated-backup-
+/)** | `tar`, `gzip`, variables, exit codes, permissions |
 | 2 | Cron Job Automation | 🔜 Planned | — | Crontab syntax, scheduling, background execution logs |
 | 3 | Log Monitoring and Parsing Tool | 🔜 Planned | — | `grep`, `awk`, `sed`, text filtering |
 | 4 | Nginx Web Server Hardening | 🔜 Planned | — | `ufw`, SSH hardening, package management |
