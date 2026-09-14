@@ -2,6 +2,16 @@
 
 Part of the Simple Linux Projects for Cloud Engineers series. A Bash script that compresses a target directory into a timestamped .tar.gz archive, built and documented around the permission model of real production systems — privileged provisioning, unprivileged execution, and failure-aware exit codes — rather than a simplified home-directory tutorial.
 
+## Project Series
+
+| # | Project | Status | Live Page | Skills |
+|---|---------|--------|-----------|--------|
+| 1 | [Automated Backup Script](index.html) | ✅ Complete | 🔗 **[View Live](https://elixirman.github.io/linux-cloud-project1-Automated-backup-/)** | `tar`, `gzip`, variables, exit codes, permissions |
+| 2 | Cron Job Automation | 🔜 Planned | — | Crontab syntax, scheduling, background execution logs |
+| 3 | Log Monitoring and Parsing Tool | 🔜 Planned | — | `grep`, `awk`, `sed`, text filtering |
+| 4 | Nginx Web Server Hardening | 🔜 Planned | — | `ufw`, SSH hardening, package management |
+| 5 | Custom Systemd Service | 🔜 Planned | — | `.service` files, `journalctl`, process management |
+
 ## What this project does
 - Takes a source directory (in this project, the production-style path /var/www/html)
 - Validates that the source and backup destination exist before doing anything
@@ -14,17 +24,6 @@ Part of the Simple Linux Projects for Cloud Engineers series. A Bash script that
 ![System Design](Schema.png)
 
 Data flows from the privileged source directory (owned by `root`), through the script running as an unprivileged user, into a timestamped archive it owns outright. The two terminal states — validation/`tar` failure vs. a verified archive — map directly to exit codes `1` and `0`.
-
-
-## Project Series
-
-| # | Project | Status | Live Page | Skills |
-|---|---------|--------|-----------|--------|
-| 1 | [Automated Backup Script](index.html) | ✅ Complete | 🔗 **[View Live](https://elixirman.github.io/linux-cloud-project1-Automated-backup-)** | `tar`, `gzip`, variables, exit codes, permissions |
-| 2 | Cron Job Automation | 🔜 Planned | — | Crontab syntax, scheduling, background execution logs |
-| 3 | Log Monitoring and Parsing Tool | 🔜 Planned | — | `grep`, `awk`, `sed`, text filtering |
-| 4 | Nginx Web Server Hardening | 🔜 Planned | — | `ufw`, SSH hardening, package management |
-| 5 | Custom Systemd Service | 🔜 Planned | — | `.service` files, `journalctl`, process management |
 
 ## Running it
 
