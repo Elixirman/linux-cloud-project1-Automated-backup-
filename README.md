@@ -3,10 +3,10 @@
 Part of the Simple Linux Projects for Cloud Engineers series. A Bash script that compresses a target directory into a timestamped .tar.gz archive, built and documented around the permission model of real production systems — privileged provisioning, unprivileged execution, and failure-aware exit codes — rather than a simplified home-directory tutorial.
 
 ## What this project does
-- **Takes a source directory (in this project, the production-style path /var/www/html)
-- **Validates that the source and backup destination exist before doing anything
-- **Produces a compressed, timestamped .tar.gz archive
-- **Reports success or failure in plain language and exits with a meaningful exit code (0 on success, 1 on failure) — the signal cron and monitoring systems rely on.
+- Takes a source directory (in this project, the production-style path /var/www/html)
+- Validates that the source and backup destination exist before doing anything
+- Produces a compressed, timestamped .tar.gz archive
+- Reports success or failure in plain language and exits with a meaningful exit code (0 on success, 1 on failure) — the signal cron and monitoring systems rely on.
 
 
 ## Architecture
@@ -16,7 +16,7 @@ Part of the Simple Linux Projects for Cloud Engineers series. A Bash script that
 Data flows from the privileged source directory (owned by `root`), through the script running as an unprivileged user, into a timestamped archive it owns outright. The two terminal states — validation/`tar` failure vs. a verified archive — map directly to exit codes `1` and `0`.
 
 
-## What this project does
+## Project Series
 
 | # | Project | Status | Live Page | Skills |
 |---|---------|--------|-----------|--------|
@@ -25,18 +25,6 @@ Data flows from the privileged source directory (owned by `root`), through the s
 | 3 | Log Monitoring and Parsing Tool | 🔜 Planned | — | `grep`, `awk`, `sed`, text filtering |
 | 4 | Nginx Web Server Hardening | 🔜 Planned | — | `ufw`, SSH hardening, package management |
 | 5 | Custom Systemd Service | 🔜 Planned | — | `.service` files, `journalctl`, process management |
-
-
-
-| File / folder | Purpose |
-|---|---|
-| [`backup.sh`](backup.sh) | The backup script itself |
-| [`backups/`](backups) | Sample output — archives produced by running the script |
-| [`index.html`](index.html) | The full write-up: overview, the production permission model, script walkthrough, architecture, security considerations, and extension exercises |
-| [`Schema.png`](Schema.png) | Architecture diagram of the backup flow |
-| [`.gitignore`](.gitignore) | Excludes local/system files (secrets and sensitive dotfiles are never committed) |
-| [`LICENSE`](LICENSE) | MIT |
-
 
 ## Running it
 
