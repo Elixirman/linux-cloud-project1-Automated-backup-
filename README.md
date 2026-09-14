@@ -6,7 +6,7 @@ Part of the Simple Linux Projects for Cloud Engineers series. A Bash script that
 
 | # | Project | Status | Live Page | Skills |
 |---|---------|--------|-----------|--------|
-| 1 | [Automated Backup Script](index.html) | ✅ Complete | 🔗 **[View Live](https://elixirman.github.io/linux-cloud-project1-Automated-backup-/)** | `tar`, `gzip`, variables, exit codes, permissions |
+| 1 | [Automated Backup Script](index.html) | ✅ Complete | 🔗 **[View Live](https://elixirman.github.io/linux-cloud-project1-Automated-backup-)** | `tar`, `gzip`, variables, exit codes, permissions |
 | 2 | Cron Job Automation | 🔜 Planned | — | Crontab syntax, scheduling, background execution logs |
 | 3 | Log Monitoring and Parsing Tool | 🔜 Planned | — | `grep`, `awk`, `sed`, text filtering |
 | 4 | Nginx Web Server Hardening | 🔜 Planned | — | `ufw`, SSH hardening, package management |
