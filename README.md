@@ -2,6 +2,8 @@
 
 A hands-on project series for building the Linux fundamentals that underpin real cloud engineering work: automation, scripting, security, and process management. Each project is written up as a self-contained reference page — not just a set of steps, but an explanation of *why* each piece is built the way it is, grounded in the permission model of real production systems (privileged provisioning, unprivileged execution, least privilege throughout).
 
+![ System Design ](Schema.png)
+
 ## Series
 
 | # | Project | Status | Live Page | Skills |
