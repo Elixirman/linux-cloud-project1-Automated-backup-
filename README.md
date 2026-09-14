@@ -19,7 +19,7 @@ LICENSE	MIT
 
 ![ System Design ](Schema.png)
 
-## Series
+## What this project does
 
 | # | Project | Status | Live Page | Skills |
 |---|---------|--------|-----------|--------|
@@ -46,32 +46,48 @@ Verify the archive without extracting it:
 bash
 tar -tzf backups/backup_*.tar.gz
 
-## Approach
+| File / folder | Purpose |
+|---|---|
+| [`backup.sh`](backup.sh) | The backup script itself |
+| [`backups/`](backups) | Sample output — archives produced by running the script |
+| [`index.html`](index.html) | The full write-up: overview, the production permission model, script walkthrough, architecture, security considerations, and extension exercises |
+| [`Schema.png`](Schema.png) | Architecture diagram of the backup flow |
+| [`.gitignore`](.gitignore) | Excludes local/system files (secrets and sensitive dotfiles are never committed) |
+| [`LICENSE`](LICENSE) | MIT |
 
-Every project in this series follows the same production-grade model rather than a simplified home-directory tutorial:
+## Architecture
 
-- **Privileged provisioning, unprivileged execution.** Source data (e.g. `/var/www/html`) is created and owned by `root`; the automation itself runs as an ordinary user with only the access it needs.
-- **Failure-aware by default.** Scripts validate their inputs and exit with meaningful, nonzero codes on failure — the same signal that cron, monitoring systems, and CI/CD pipelines rely on.
-- **Security is treated as a first-class concern**, not an afterthought — including calling out anti-patterns (like plaintext credentials) encountered along the way.
+![System Design](Schema.png)
 
-## Viewing the projects
+Data flows from the privileged source directory (owned by `root`), through the script running as an unprivileged user, into a timestamped archive it owns outright. The two terminal states — validation/`tar` failure vs. a verified archive — map directly to exit codes `1` and `0`.
 
-Each project is a single, self-contained HTML file under `projects/`. Open it directly in a browser, or serve the folder locally:
+## Running it
 
 ```bash
-cd projects/01-automated-backup-script
-python3 -m http.server 8000
-# then visit http://localhost:8000
+chmod +x backup.sh
+./backup.sh
 ```
 
-## Hosting with GitHub Pages
+Expected output on success:
 
-1. Push the repo to GitHub (see below).
-2. In the repo, go to **Settings → Pages**.
-3. Under **Build and deployment → Source**, choose **Deploy from a branch**.
-4. Set **Branch** to `main` and folder to `/ (root)`, then **Save**.
-5. GitHub will publish the whole repo at `https://<username>.github.io/<repo-name>/`. Each project page is then reachable at `https://<username>.github.io/<repo-name>/projects/01-automated-backup-script/`.
-6. Update the placeholder link in the table above once the page is live (can take a minute or two after the first push).
+```
+Starting backup of '/var/www/html'...
+SUCCESS: Backup created at '/home/<user>/backups/backup_<timestamp>.tar.gz'
+```
+
+Verify the archive without extracting it:
+
+```bash
+tar -tzf backups/backup_*.tar.gz
+```
+
+## Approach
+
+- **Privileged provisioning, unprivileged execution.** The source directory is created and owned by `root`; the script itself runs as an ordinary user with only the read access it needs.
+- **Failure-aware by default.** Every step validates its inputs and exits nonzero on failure rather than failing silently.
+- **Security as a first-class concern.** The write-up (`index.html`) calls out real anti-patterns encountered along the way, including handling of a plaintext credential in the sample source data.
+
+For the full explanation of every line of the script and the reasoning behind each design choice, see [`index.html`](index.html).
 
 ## License
 
