@@ -20,8 +20,6 @@ Part of the *Simple Linux Projects for Cloud Engineers* series. A Bash script th
 | [`.gitignore`](.gitignore) | Excludes local/system files (secrets and sensitive dotfiles are never committed) |
 | [`LICENSE`](LICENSE) | MIT |
 
- 🔗 **[View Live](https://elixirman.github.io/linux-cloud-project1-Automated-backup-/)**
-
 ## Architecture
 
 ![System Design](Schema.png)
